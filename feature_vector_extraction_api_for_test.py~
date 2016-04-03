@@ -289,6 +289,139 @@ time1 = time.time()
 f = open(path_full_list + "/" + 'full_list')
 interesting = f.read().splitlines()
 f.close()
+'''
+try:
+	#Androguard structures
+        a = APK(apk_name)
+	d = dvm.DalvikVMFormat( a.get_dex() )
+	#x = VMAnalysis(d)
+except:
+	print ('Failed to build Androguard structures')
+	
+api = get_used_api(d)
+intents = get_used_intents(a)
+hw_features = get_used_hw_features(a)
+permissions = a.get_permissions()
+receivers = a.get_receivers()
+services = a.get_services()
+providers = a.get_providers()
+activities = a.get_activities()
+real_permissions = get_real_permissions(d)
+#addresses = get_used_addresses(d)
+
+app_features = []
+
+if api != None:
+        for item in api:
+                if item in susp_api:
+                        carry = 'api_call::' + item
+                        if not carry in app_features:
+                                app_features.append(carry)
+                        if not carry in interesting:
+                                interesting.append(carry)
+                if item in dang_api:
+                        carry = 'call::' + item
+                        if not carry in app_features:
+                                app_features.append(carry)
+                        if not carry in interesting:
+                                interesting.append(carry)                
+if intents != None:
+        for item in intents:
+                carry = 'intent::' + item
+                if not carry in app_features:
+                        app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+if hw_features != None:
+        for item in hw_features:
+                carry = 'feature::' + item
+                if not carry in app_features:
+                        app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+if permissions != None:
+        for item in permissions:
+                carry = 'permission::' + item
+                if not carry in app_features:
+                        app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+if receivers != None:
+        for item in receivers:
+                carry = 'service_receiver::' + item
+                if not carry in app_features:
+                        app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+if services != None:
+        for item in services:
+                carry = 'service::' + item
+                if not carry in app_features:
+                        app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+if providers != None:
+        for item in providers:
+                carry = 'provider::' + item
+                app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+if activities != None:
+        for item in activities:
+                carry = 'activity::' + item
+                if not carry in app_features:
+                        app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+if real_permissions != None:
+        for item in real_permissions:
+                carry = 'real_permission::' + item
+                if not carry in app_features:
+                        app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+if addresses != None:
+        for item in addresses:
+                carry = 'address::' + item
+                if not carry in app_features:
+                        app_features.append(carry)
+                if not carry in interesting:
+                        interesting.append(carry)
+#if smth None - continue                
+apk_hash = hashlib.sha256(open(apk_name, 'r').read()).hexdigest()
+save_directory = '/home/alisa/dajbog/drebin/result'
+
+f = open(save_directory + "/" + 'full_list', 'w')
+for item in interesting:
+        f.write(item)
+        f.write('\n')
+
+
+f = open(save_directory + "/" + apk_hash, 'w')
+for item in app_features:
+        f.write(item)
+        f.write('\n')
+f.close()
+
+#after feature list is collected:
+for f_file in os.listdir(save_directory):
+        file_path = save_directory + '/' + f_file
+        f = open(file_path)
+	app_features = f.read().splitlines()
+	f.close()
+        features = {}
+        str_f = ''
+        for item in interesting:
+                if item in app_features:
+                        str_f +='1'
+                else:
+                        str_f +='0'
+        file_path = save_directory + '1'+ '/' + f_file
+        f = open(file_path, 'w')
+        f.write(str_f)
+        f.close()
+'''
+#***************************************************************************************
 
 for i in range(2, 4):
 	list_p = os.listdir(path_apps[i])
